@@ -1,4 +1,4 @@
-package med.voll.api.infra.exception;
+package med.voll.api.infra;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
