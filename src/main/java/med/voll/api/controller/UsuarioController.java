@@ -2,7 +2,9 @@ package med.voll.api.controller;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import med.voll.api.domain.medico.DadosDetalhamentoMedico;
 import med.voll.api.domain.usuario.DadosCadastroUsuario;
+import med.voll.api.domain.usuario.DadosDetalhamentoUsuario;
 import med.voll.api.domain.usuario.Usuario;
 import med.voll.api.domain.usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,16 @@ public class UsuarioController {
     @PostMapping
     @Transactional
     public ResponseEntity cadastro(@RequestBody @Valid DadosCadastroUsuario dados, UriComponentsBuilder uriBuilder) {
+        if (repository.findByLogin(dados.login()) != null){
+            return ResponseEntity.badRequest().body("Login já Cadastrado!!!!");
+        }
+
         var senhaCriptografada = passwordEncoder.encode(dados.senha());
         var usuario = new Usuario(dados.login(), senhaCriptografada);
 
         repository.save(usuario);
-        return null;
+
+        var uri = uriBuilder.path("/cadastros/{id}").buildAndExpand(usuario.getId()).toUri();
+        return ResponseEntity.created(uri).body(new DadosDetalhamentoUsuario(usuario));
     }
 }

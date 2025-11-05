@@ -22,14 +22,21 @@ public class SecurityConfigurations {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable).sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                 .authorizeHttpRequests(req -> {req.requestMatchers("/login").permitAll();
-                     req.requestMatchers("/cadastros").permitAll();
-                     req.anyRequest().authenticated();
-                 })
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sm -> sm.sessionCreationPolicy
+                        (SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(req -> {
+                    req.requestMatchers("/login", "/cadastros" ).permitAll();
+                    req.requestMatchers("/v3/api-docs/**",
+                            "/swagger-ui.html",
+                            "/swagger-ui/**").permitAll();
+                    req.anyRequest().authenticated();
+                })
+                .addFilterBefore(securityFilter,
+                        UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager (AuthenticationConfiguration configuration) throws Exception {
